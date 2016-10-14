@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<title>New Post</title>
+  <link href="https://fonts.googleapis.com/css?family=Libre+Franklin" rel="stylesheet">
+  <link type="text/css" rel="stylesheet" href="/static/main.css" />
+</head>
+
+<body>
+	
+	<h1 style="text-align: center">New post</h1>
+
+  <div class="new-post">
+		<form method="post">
+      <label>
+        <h2>Subject</h2>
+        <input type="text" name="subject" value="{{subject}}">
+      </label>
+      <br> <br>
+      <label>
+        <h2>Body</h2>
+        <textarea name="content">{{content}}</textarea>
+      </label>
+
+      <br>
+
+      <div class="error">{{error}}</div>
+
+      <br>
+
+      <input type="submit">
+    </form>
+  </div>
+
+</body>
+
+</html>

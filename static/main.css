@@ -1,0 +1,68 @@
+body {
+    font-family: 'Libre Franklin', sans-serif;
+    font-size: 14px;
+
+    width: 800px;
+    margin: 0 auto;
+    padding: 10px;
+
+}
+
+.new-post {
+	padding-top: 30px;
+	padding-left: 15px;
+}
+
+input[type=text] {
+  width: 600px;
+  font-size: 20px;
+  padding: 2px;
+
+}
+
+textarea {
+  width: 600px;
+  height: 500px;
+  font-size: 16px;
+  font-family: 'Libre Franklin', sans-serif;
+}
+
+input[type=submit] {
+	font-size: 18px;
+	text-transform: uppercase;
+}
+
+.error {
+	font-size: 24px;
+	color: red;
+	font-weight: 800;
+}
+
+.post {
+	padding-bottom: 30px;
+}
+
+.post-title {
+	font-size: 24px;
+	font-weight: 800;
+	padding-bottom: 2px;
+}
+
+.post-date {
+	color: #3a3a3a;
+	font-weight: 200;
+	padding-bottom: 25px;
+}
+
+.post-content {
+	font-size: 16px;
+}
+
+a {
+	text-decoration: none;
+	color: #161616;
+}
+
+a:hover {
+	text-decoration: underline;
+}
