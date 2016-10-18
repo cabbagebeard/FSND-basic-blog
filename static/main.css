@@ -1,3 +1,28 @@
+.top_menu {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	background-color: #333;
+}
+
+.top_menu li {
+	float: left;
+}
+
+.top_menu li a {
+		display: block;
+		color: white;
+		padding: 24px 100px;
+		text-decoration: none;
+		font-size: 18px;
+		font-weight: 800;
+}
+
+.top_menu li a:hover {
+	background-color: #111;
+}
+
 body {
     font-family: 'Libre Franklin', sans-serif;
     font-size: 14px;
@@ -66,3 +91,4 @@ a {
 a:hover {
 	text-decoration: underline;
 }
+
