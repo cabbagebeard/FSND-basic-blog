@@ -119,9 +119,6 @@ class Post(db.Model):
 		self._render_text = self.content.replace('\n', '<br>')
 		return render_str("post.html", p = self)
 
-	def delete(self):
-		db.delete(self)
-
 class MainPage(Handler):
 	def get(self):
 		posts = db.GqlQuery("SELECT * FROM Post ORDER BY created DESC LIMIT 8")
@@ -158,7 +155,6 @@ class NewPost(Handler):
 			self.render("new_post.html", subject=subject, content=content, error=error)
 
 class DeletePost(Handler):
-
 	def get(self):
 		if self.user:
 			post_id = self.request.get("post")
@@ -179,11 +175,12 @@ class DeletePost(Handler):
 			post = db.get(key)
 			if post.creator == self.user.name:
 				post.delete()
-				msg = "Your post was deleted successfully."
-				self.render('/', msg = msg)
+				self.redirect('/deletion')
 			else:
-				msg = "You do not have permission to delete this post."
-				self.render('/', msg = msg)
+				self.redirect('/')
+class DeleteSuccess(Handler):
+	def get(self):
+		self.render('deletion.html')
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 def valid_username(username):
@@ -282,6 +279,7 @@ app = webapp2.WSGIApplication([
     ('/([0-9]+)', PostPage),
     ('/newpost', NewPost),
     ('/delete', DeletePost),
+    ('/deletion', DeleteSuccess),
     #('/edit', EditPost),
     ('/signup', SignUp),
     ('/login', Login),

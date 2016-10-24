@@ -5,16 +5,17 @@
 	<br><br>
 	{% block content %}
 
-	{% if not user %}<h3 style="text-align:center"><a href="/login">You are not signed in.</a></h3>{% endif %}
+	{% if not user %}
+		<h1>Welcome to the blog.</h1>
+		<h3 style="text-align:center"><a href="/login">You are not signed in.</a></h3>
+	{% endif %}
 
-	{{ msg }}
-
-	<h1>Welcome to the Blog.</h1>
+	{% if user %}<h1>Welcome, {{ user.name }}.</h1>{% endif %}
 	<br><br>
 
 		{% for p in posts %}
 			{{ p.render() | safe }}
-			<br><br><br>
+				<br><br><br>
 		{% endfor %}
 
 	{% endblock %}
