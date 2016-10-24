@@ -1,7 +1,3 @@
-#Front Page that lists entries
-# Form to submit new entries
-# Permalink page for entries
-
 import os
 import webapp2
 import re
@@ -117,10 +113,14 @@ class Post(db.Model):
 	content = db.TextProperty(required = True)
 	created = db.DateTimeProperty(auto_now_add = True)
 	last_modified = db.DateTimeProperty(auto_now = True)
+	creator = db.StringProperty()
 
 	def render(self):
 		self._render_text = self.content.replace('\n', '<br>')
 		return render_str("post.html", p = self)
+
+	def delete(self):
+		db.delete(self)
 
 class MainPage(Handler):
 	def get(self):
@@ -138,6 +138,7 @@ class PostPage(Handler):
 
 		self.render("permalink.html", post = post)
 
+
 class NewPost(Handler):
 	def get(self):
 		self.render("new_post.html")
@@ -145,15 +146,44 @@ class NewPost(Handler):
 	def post(self):
 		subject = self.request.get('subject')
 		content = self.request.get('content')
+		creator = self.request.get('creator')
 
 		if subject and content:
-			p = Post(parent = blog_key(), subject = subject, content = content)
+			p = Post(parent = blog_key(), subject = subject, content = content, creator = creator)
 			p.put()
 			self.redirect('/%s' % str(p.key().id()))
 
 		else:
 			error = "You need a subject and content to post a new entry."
 			self.render("new_post.html", subject=subject, content=content, error=error)
+
+class DeletePost(Handler):
+
+	def get(self):
+		if self.user:
+			post_id = self.request.get("post")
+			key = db.Key.from_path("Post", int(post_id), parent=blog_key())
+			post = db.get(key)
+		if not post:
+			self.error(404)
+			return
+		if self.user.name == post.creator:
+			self.render("delete.html", post=post_id)
+		else:
+			self.redirect('/')
+
+	def post(self):
+		if self.user:
+			post_id = self.request.get("post")
+			key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+			post = db.get(key)
+			if post.creator == self.user.name:
+				post.delete()
+				msg = "Your post was deleted successfully."
+				self.render('/', msg = msg)
+			else:
+				msg = "You do not have permission to delete this post."
+				self.render('/', msg = msg)
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 def valid_username(username):
@@ -251,8 +281,12 @@ app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/([0-9]+)', PostPage),
     ('/newpost', NewPost),
+    ('/delete', DeletePost),
+    #('/edit', EditPost),
     ('/signup', SignUp),
     ('/login', Login),
     ('/logout', Logout),
+		#('/comment)', Comment),
+		#('/([0-9]+)like/', Like),
 		],
 		debug=True)

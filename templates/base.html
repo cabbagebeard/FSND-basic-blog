@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Libre+Franklin" rel="stylesheet">
+	<link type="text/css" rel="stylesheet" href="/static/main.css" />
+</head>
+
+<body> 
+	<ul class="top_menu">
+		<li><a href="/">Home</a></li>
+		{% if user %}
+		<li><a href="/newpost">New post</a></li>
+		<li><a href="/logout">Log out</a></li>
+		{% endif %}
+
+		{% if not user %}
+		<li><a href="/signup">Sign up</a></li>
+		<li><a href="/login">Log in</a></li>
+		{% endif %}
+
+	</ul>
+	<br> <br>
+	<br>
+  <div id="content">
+  	{% block content %}
+  	{% endblock %}
+  </div>
+
+  </body>
+
+	</html>

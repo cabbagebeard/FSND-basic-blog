@@ -1,18 +1,17 @@
-<!DOCTYPE html>
-
-<html>
-
 <head>
 	<title>{{post.subject}}</title>
-	<link href="https://fonts.googleapis.com/css?family=Libre+Franklin" rel="stylesheet">
-	<link type="text/css" rel="stylesheet" href="/static/main.css" />
 </head>
+<br> <br>
+{% extends "base.html" %}
+{% block content %}
+		{% if user.name == post.creator %} 
+			<a href="/edit?post={{post.key().id()}}">Edit</a>		
+			<a href="/delete?post={{post.key().id()}}">Delete</a>
+		{% else %}
+			<a href="/blog/{{post.key().id()}}/like">Like</a>
+    {% endif %}
 
-<body>
-	<br> <br> <br>
-	<div>
-		{{post.render() | safe}}
-	</div>
+	{{post.render() | safe}}
 
-</body>
-</html>
+
+{% endblock %}

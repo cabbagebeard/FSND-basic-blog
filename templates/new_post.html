@@ -1,19 +1,17 @@
-<!DOCTYPE html>
-
-<html>
 
 <head>
 	<title>New Post</title>
-  <link href="https://fonts.googleapis.com/css?family=Libre+Franklin" rel="stylesheet">
-  <link type="text/css" rel="stylesheet" href="/static/main.css" />
 </head>
 
-<body>
-	
-	<h1 style="text-align: center">New post</h1>
+{% extends "base.html" %}
 
+{% block content %}
+
+	<h1>New post</h1>
+  <h3 style="text-align:center"> Writing as {{ user.name }} </h3>
   <div class="new-post">
 		<form method="post">
+      <input type="hidden" name="creator" value= "{{user.name}}">
       <label>
         <h2>Subject</h2>
         <input type="text" name="subject" value="{{subject}}">
@@ -34,6 +32,5 @@
     </form>
   </div>
 
-</body>
+{% endblock %}
 
-</html>

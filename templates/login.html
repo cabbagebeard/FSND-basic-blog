@@ -1,10 +1,9 @@
 <head>
 	<title>Login</title>
-	<link href="https://fonts.googleapis.com/css?family=Libre+Franklin" rel="stylesheet">
-	<link type="text/css" rel="stylesheet" href="/static/main.css" />
 </head>
 
-<body>
+{% extends "base.html" %}
+{% block content %}
 	<h1>Login</h1>
 	<br><br>
 	<form method="post">
@@ -21,4 +20,4 @@
 		<input type="submit">
 	</form>
 
-</body>
+{% endblock %}
