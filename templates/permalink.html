@@ -17,8 +17,9 @@
     {% if not user %}<h4>You must be a user to like posts.</h4>{% endif %}
     {% if user.name == post.creator %}<h4>Users cannot like their own posts.</h4>{% endif %}
   </div>
+  <h3>
   {% if user.name != post.creator %}
-    {% if user %}<h3><a href="/{{post.key().id()}}/like">Like</a> | {% endif %}
+    {% if user %}<a href="/{{post.key().id()}}/like">Like</a> | {% endif %}
   {% endif %}
   {% if user %}<a href="/newcomment?post={{post.key().id()}}">Add Comment</a></h3>{% endif %}
   <br><br>
@@ -27,6 +28,13 @@
   {% for c in post.comments %}
   <div class="comment">
   	<div class="comment-creator">{{c.creator}}:</div>
+    <div class="comment-date">{{c.created.strftime("%b %d, %Y")}}
+
+    <!--allows the comment's creator to edit or delete their comments-->
+      {% if c.creator == user.name %}
+        <h4><a href="/{{post.key().id()}}/editcomment/{{c.key().id()}}">Edit</a> | <a href="/{{post.key().id()}}/deletecomment/{{c.key().id()}}"> Delete</a></h4>
+      {% endif %}
+    </div>
     <br>
   	<div class="comment-body">{{c.comment}}</div>
     <br><br>

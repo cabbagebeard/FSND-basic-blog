@@ -103,8 +103,9 @@ a:hover {
 }
 
 .comment {
-	border: 1px solid #c9c9c9;
+	border: 2px solid #515151;
 	margin-bottom: 25px;
+	background-color: #f2f2f2;
 }
 
 .comment-creator {
@@ -115,4 +116,10 @@ a:hover {
 
 .comment-body {
 	padding: 5px;
+	font-size: 120%;
+}
+
+.comment-date {
+	padding: 5px;
+	font-size: 85%;
 }
