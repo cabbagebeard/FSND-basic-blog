@@ -1,36 +1,25 @@
-
 <head>
-	<title>New Post</title>
+	<title>New Comment</title>
 </head>
 
 {% extends "base.html" %}
 
 {% block content %}
 
-	<h1>New Post</h1>
+	<h1>New Comment</h1>
   <h3 style="text-align:center"> Writing as {{ user.name }} </h3>
   <div class="new-post">
 		<form method="post">
       <input type="hidden" name="creator" value= "{{user.name}}">
       <label>
-        <h2>Subject</h2>
-        <input type="text" name="subject" value="{{subject}}">
+        <h2>Comment</h2>
+        <textarea name="comment">{{comment}}</textarea>
       </label>
-      <br> <br>
-      <label>
-        <h2>Body</h2>
-        <textarea name="content">{{content}}</textarea>
-      </label>
-
       <br>
-
       <div class="error">{{error}}</div>
-
       <br>
-
-      <input type="submit" value="post">
+      <input type="submit" value="comment">
     </form>
   </div>
 
 {% endblock %}
-

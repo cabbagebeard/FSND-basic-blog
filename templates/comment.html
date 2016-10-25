@@ -1,0 +1,14 @@
+<div class="comment">
+    <br>
+    <div class="comment-date">
+      <!--Checks to see if edited and will display if so-->
+      {% if c.edited %} Edited by {{ c.creator }}
+      {% else %} Comment by {{ c.creator }} 
+      {% endif %}
+      on {{c.created.strftime("%b %d, %Y")}}
+      <hr>
+   </div>
+  <div class="post-content">
+    {{c._render_text | safe}}
+  </div>
+</div>

@@ -10,7 +10,7 @@
       {% else %} Written by {{ p.creator }} 
       {% endif %}
       on {{p.created.strftime("%b %d, %Y")}}
-      <p>Likes: {{ p.likes }}</p>
+      <p>Likes: {{ p.likes }} | Comments: {{ p.comments.count() }}</p>
       <hr>
     </div>
   </div>

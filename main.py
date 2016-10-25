@@ -122,6 +122,20 @@ class Post(db.Model):
 		self._render_text = self.content.replace('\n', '<br>')
 		return render_str("post.html", p = self)
 
+	#To be able to iterate over comments	
+	@property
+	def comments(self):
+		return Comment.all().filter("post = ", str(self.key().id()))
+
+class Comment(db.Model):
+	comment = db.TextProperty(required=True)
+	creator = db.StringProperty()
+	created = db.DateTimeProperty(auto_now_add = True)
+	post= db.StringProperty()
+
+	def render(self):
+		self.render('comment.html')
+
 class MainPage(Handler):
 	def get(self):
 		posts = db.GqlQuery("SELECT * FROM Post ORDER BY created DESC LIMIT 8")
@@ -141,9 +155,14 @@ class PostPage(Handler):
 
 class NewPost(Handler):
 	def get(self):
-		self.render("new_post.html")
+		if self.user:
+			self.render("newpost.html")
+		else:
+			self.redirect('/login')
 
 	def post(self):
+		if not self.user:
+			self.redirect('/login')
 		subject = self.request.get('subject')
 		content = self.request.get('content')
 		creator = self.request.get('creator')
@@ -154,7 +173,35 @@ class NewPost(Handler):
 			self.redirect('/%s' % str(p.key().id()))
 		else:
 			error = "You need a subject and content to post a new entry."
-			self.render("new_post.html", subject=subject, content=content, error=error)
+			self.render("newpost.html", subject=subject, content=content, error=error)
+
+class NewComment(Handler):
+	def get(self):
+		post_id = self.request.get("post")
+		key = db.Key.from_path("Post", int(post_id), parent=blog_key())
+		post = db.get(key)
+		if self.user:
+			self.render('newcomment.html', post=post_id)
+		if not post:
+			self.error(404)
+			return
+		if not self.user:
+			self.redirect('/login')
+
+	def post(self):
+		post_id = self.request.get("post")
+		key = db.Key.from_path("Post", int(post_id), parent=blog_key())
+		post = db.get(key)
+		if self.user:
+			comment = self.request.get('comment')
+			creator = self.request.get('creator')
+		if comment:
+			c = Comment(comment=comment, post=post_id, creator=creator)
+			c.put()
+			self.redirect("/%s" % str(post_id))
+		else:
+			error = "Please write a comment"
+			self.render('newcomment.html', comment=comment, error=error)
 
 class DeletePost(Handler):
 	def get(self):
@@ -215,7 +262,7 @@ class EditPost(Handler):
 			self.redirect("/%s" % str(post.key().id()))
 		else:
 			error = "Please fill in both a subject and content."
-			self.render('editpost.html', subject = subject, content = content, error='error')
+			self.render('editpost.html', subject = subject, content = content, error= error)
 
 class Like(Handler):
 	def get(self, post_id):
@@ -337,7 +384,9 @@ app = webapp2.WSGIApplication([
     ('/signup', SignUp),
     ('/login', Login),
     ('/logout', Logout),
-		#('/comment)', Comment),
-		('/([0-9]+)/like', Like),
+		('/newcomment', NewComment),
+		#("/([0-9]+)/editcomment/([0-9]+)", EditComment),
+		#("/([0-9]+)/deletecomment/([0-9]+)", DeleteComment),
+  	('/([0-9]+)/like', Like),
 		],
 		debug=True)

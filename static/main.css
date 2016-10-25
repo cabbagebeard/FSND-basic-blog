@@ -69,7 +69,8 @@ input[type=submit] {
 }
 
 .post {
-	padding-bottom: 30px;
+	padding: 50px;
+	border: 1px solid #c9c9c9;
 }
 
 .post-title {
@@ -97,3 +98,21 @@ a:hover {
 	text-decoration: underline;
 }
 
+.likes {
+	color:#277ab2;
+}
+
+.comment {
+	border: 1px solid #c9c9c9;
+	margin-bottom: 25px;
+}
+
+.comment-creator {
+	padding: 5px;
+	font-weight: 800;
+	font-size: 120%;
+}
+
+.comment-body {
+	padding: 5px;
+}
