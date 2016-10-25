@@ -4,13 +4,13 @@
 <br> <br>
 {% extends "base.html" %}
 {% block content %}
-		{% if user.name == post.creator %} 
-			<a href="/edit?post={{post.key().id()}}">Edit</a>		
-			<a href="/delete?post={{post.key().id()}}">Delete</a>
-		{% else %}
-			<a href="/blog/{{post.key().id()}}/like">Like</a>
-    {% endif %}
-
+	{% if user.name == post.creator %} 
+		<h4><a href="/editpost?post={{post.key().id()}}">Edit</a> | <a href="/delete?post={{post.key().id()}}"> Delete</a></h4>
+	{%  endif %}
+	{% if user %}
+		<h4><a href="/blog/{{post.key().id()}}/like">Like</a></h4>
+  {% endif %}
+  <br><br>
 	{{post.render() | safe}}
 
 

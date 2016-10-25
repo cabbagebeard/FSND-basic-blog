@@ -4,7 +4,11 @@
       <a href="/{{p.key().id()}}">{{p.subject}}</a>
     </div>
     <div class="post-date">
-      Written by {{ p.creator }} on {{p.created.strftime("%b %d, %Y")}}
+      <!--Checks to see if edited and will display if so-->
+      {% if p.edited %} Edited by {{ p.creator }}
+      {% else %} Written by {{ p.creator }} 
+      {% endif %}
+      on {{p.created.strftime("%b %d, %Y")}}
       <hr>
     </div>
   </div>

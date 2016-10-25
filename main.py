@@ -114,6 +114,7 @@ class Post(db.Model):
 	created = db.DateTimeProperty(auto_now_add = True)
 	last_modified = db.DateTimeProperty(auto_now = True)
 	creator = db.StringProperty()
+	edited = db.BooleanProperty()
 
 	def render(self):
 		self._render_text = self.content.replace('\n', '<br>')
@@ -146,7 +147,7 @@ class NewPost(Handler):
 		creator = self.request.get('creator')
 
 		if subject and content:
-			p = Post(parent = blog_key(), subject = subject, content = content, creator = creator)
+			p = Post(parent = blog_key(), subject = subject, content = content, creator = creator, edited = False)
 			p.put()
 			self.redirect('/%s' % str(p.key().id()))
 
@@ -178,9 +179,42 @@ class DeletePost(Handler):
 				self.redirect('/deletion')
 			else:
 				self.redirect('/')
+
 class DeleteSuccess(Handler):
 	def get(self):
 		self.render('deletion.html')
+
+class EditPost(Handler):
+	def get(self):
+		if self.user:
+			post_id = self.request.get("post")
+			key = db.Key.from_path("Post", int(post_id), parent=blog_key())
+			post = db.get(key)
+		if not post:
+			self.error(404)
+			return
+		if self.user.name == post.creator:
+			self.render('editpost.html', subject = post.subject, content = post.content)
+		else:
+			self.redirect('/')
+
+	def post(self):
+		if self.user:
+			post_id = self.request.get("post")
+			key = db.Key.from_path("Post", int(post_id), parent=blog_key())
+			post = db.get(key)
+			subject = self.request.get("subject")
+			content = self.request.get("content")
+			creator = self.request.get('creator')
+		if subject and content:
+			post.subject = subject
+			post.content = content
+			post.edited = True
+			post.put()
+			self.redirect("/%s" % str(post.key().id()))
+		else:
+			error = "Please fill in both a subject and content."
+			self.render('editpost.html', subject = subject, content = content, error='error')
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 def valid_username(username):
@@ -280,7 +314,7 @@ app = webapp2.WSGIApplication([
     ('/newpost', NewPost),
     ('/delete', DeletePost),
     ('/deletion', DeleteSuccess),
-    #('/edit', EditPost),
+    ('/editpost', EditPost),
     ('/signup', SignUp),
     ('/login', Login),
     ('/logout', Logout),
