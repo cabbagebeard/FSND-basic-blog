@@ -115,6 +115,8 @@ class Post(db.Model):
 	last_modified = db.DateTimeProperty(auto_now = True)
 	creator = db.StringProperty()
 	edited = db.BooleanProperty()
+	likes = db.IntegerProperty()
+	liked_by = db.ListProperty(str)
 
 	def render(self):
 		self._render_text = self.content.replace('\n', '<br>')
@@ -147,10 +149,9 @@ class NewPost(Handler):
 		creator = self.request.get('creator')
 
 		if subject and content:
-			p = Post(parent = blog_key(), subject = subject, content = content, creator = creator, edited = False)
+			p = Post(parent = blog_key(), subject = subject, content = content, creator = creator, edited = False, likes = 0, liked_by=[])
 			p.put()
 			self.redirect('/%s' % str(p.key().id()))
-
 		else:
 			error = "You need a subject and content to post a new entry."
 			self.render("new_post.html", subject=subject, content=content, error=error)
@@ -215,6 +216,24 @@ class EditPost(Handler):
 		else:
 			error = "Please fill in both a subject and content."
 			self.render('editpost.html', subject = subject, content = content, error='error')
+
+class Like(Handler):
+	def get(self, post_id):
+		key = db.Key.from_path("Post", int(post_id), parent=blog_key())
+		post = db.get(key)
+		if not self.user:
+			self.redirect('/login')
+		else:
+			creator = post.creator
+			current_user = self.user.name
+
+		if creator ==  current_user or current_user in post.liked_by:
+			self.redirect("/%s" % str(post.key().id()))
+		else:
+			post.likes += 1
+			post.liked_by.append(current_user)
+			post.put()
+			self.redirect("/%s" % str(post.key().id()))
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 def valid_username(username):
@@ -319,6 +338,6 @@ app = webapp2.WSGIApplication([
     ('/login', Login),
     ('/logout', Logout),
 		#('/comment)', Comment),
-		#('/([0-9]+)like/', Like),
+		('/([0-9]+)/like', Like),
 		],
 		debug=True)

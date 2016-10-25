@@ -5,13 +5,16 @@
 {% extends "base.html" %}
 {% block content %}
 	{% if user.name == post.creator %} 
-		<h4><a href="/editpost?post={{post.key().id()}}">Edit</a> | <a href="/delete?post={{post.key().id()}}"> Delete</a></h4>
+		<h3><a href="/editpost?post={{post.key().id()}}">Edit</a> | <a href="/delete?post={{post.key().id()}}"> Delete</a></h3>
 	{%  endif %}
-	{% if user %}
-		<h4><a href="/blog/{{post.key().id()}}/like">Like</a></h4>
-  {% endif %}
   <br><br>
 	{{post.render() | safe}}
-
-
+	<br><br>
+	{% if user.name != post.creator %}
+		{% if user %}<h3><a href="/{{post.key().id()}}/like">Like</a></h3>{% endif %}
+  {% endif %}
+  <h4>Likes: <strong>{{ post.likes }}</strong></h4>
+  {% if user.name in post.liked_by %}<h4>You like this post.</h4>{% endif %}
+  {% if not user %}<h4>You must be a user to like posts.</h4>{% endif %}
+  {% if user.name == post.creator %}<h4>Users cannot like their own posts.</h4>{% endif %}
 {% endblock %}

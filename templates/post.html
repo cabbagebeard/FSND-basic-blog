@@ -3,12 +3,14 @@
     <div class="post-title">
       <a href="/{{p.key().id()}}">{{p.subject}}</a>
     </div>
+    <br>
     <div class="post-date">
       <!--Checks to see if edited and will display if so-->
       {% if p.edited %} Edited by {{ p.creator }}
       {% else %} Written by {{ p.creator }} 
       {% endif %}
       on {{p.created.strftime("%b %d, %Y")}}
+      <p>Likes: {{ p.likes }}</p>
       <hr>
     </div>
   </div>
