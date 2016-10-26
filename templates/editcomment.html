@@ -1,15 +1,15 @@
 <head>
-	<title>New Comment</title>
+  <title>Edit Comment</title>
 </head>
 
 {% extends "base.html" %}
 
 {% block content %}
 
-	<h1>New Comment</h1>
+<h1>Editing post</h1>
   <h3 style="text-align:center"> Writing as {{ user.name }} </h3>
   <div class="new-post">
-		<form method="post">
+    <form method="post">
       <input type="hidden" name="creator" value= "{{user.name}}">
       <label>
         <h2>Comment</h2>
@@ -18,8 +18,8 @@
       <br>
       <div class="error">{{error}}</div>
       <br>
-      <input type="submit" value="comment">
+      <input type="submit">
     </form>
   </div>
-
+  
 {% endblock %}

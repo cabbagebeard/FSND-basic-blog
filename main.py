@@ -128,7 +128,7 @@ class Post(db.Model):
 		return Comment.all().filter("post = ", str(self.key().id()))
 
 class Comment(db.Model):
-	comment = db.TextProperty(required=True)
+	content = db.TextProperty(required=True)
 	creator = db.StringProperty(required=True)
 	created = db.DateTimeProperty(auto_now_add = True)
 	post= db.StringProperty()
@@ -147,11 +147,10 @@ class PostPage(Handler):
 		post = db.get(key)
 
 		if not post:
-			self.error(403)
+			self.error(404)
 			return
 
 		self.render("permalink.html", post = post)
-
 
 class NewPost(Handler):
 	def get(self):
@@ -182,7 +181,7 @@ class DeletePost(Handler):
 			key = db.Key.from_path("Post", int(post_id), parent=blog_key())
 			post = db.get(key)
 		if not post:
-			self.error(403)
+			self.error(405)
 			return
 		if self.user.name == post.creator:
 			self.render("delete.html", post=post_id)
@@ -211,7 +210,7 @@ class EditPost(Handler):
 			key = db.Key.from_path("Post", int(post_id), parent=blog_key())
 			post = db.get(key)
 		if not post:
-			self.error(403)
+			self.error(404)
 			return
 		if self.user.name == post.creator:
 			self.render('editpost.html', subject = post.subject, content = post.content)
@@ -244,7 +243,7 @@ class NewComment(Handler):
 		if self.user:
 			self.render('newcomment.html', post=post_id)
 		if not post:
-			self.error(403)
+			self.error(405)
 			return
 		if not self.user:
 			self.redirect('/login')
@@ -254,34 +253,61 @@ class NewComment(Handler):
 		key = db.Key.from_path("Post", int(post_id), parent=blog_key())
 		post = db.get(key)
 		if self.user:
-			comment = self.request.get('comment')
+			content = self.request.get('content')
 			creator = self.request.get('creator')
-		if comment:
-			c = Comment(comment=comment, post=post_id, creator=creator)
+		if content:
+			c = Comment(content=content, post=post_id, creator=creator)
 			c.put()
 			self.redirect("/%s" % str(post_id))
 		else:
 			error = "Please write a comment"
-			self.render('newcomment.html', comment=comment, error=error)
+			self.render('newcomment.html', content=content, error=error)
 
-#def DeleteComment(Handler):
-	#Comment's creator can be accessed through post.comments.creator (or "for c in post.comments" c.creator)
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
+class DeleteComment(Handler):
+	def get(self):
+		comment_id = self.request.get('comment')
+		key = db.Key.from_path('Comment', int(comment_id))
+		comment = db.get(key)
+		if self.user.name == comment.creator:
+			self.render("deletecomment.html", comment=comment)
+		else:
+			self.error(405)
+			return
+	def post(self):
+		comment_id = self.request.get('comment')
+		key = db.Key.from_path('Comment', int(comment_id))
+		comment = db.get(key)
+		if self.user.name == comment.creator:
+			comment.delete()
+			self.redirect('/deletion')
+		else:
+			self.error(405)
+			return
+
+class EditComment(Handler):
+	def get(self):
+		comment_id = self.request.get('comment')
+		key = db.Key.from_path('Comment', int(comment_id))
+		comment = db.get(key)
+		if self.user.name == comment.creator:
+			self.render('editcomment.html', comment=comment, content=comment.content)
+		else:
+			self.error(405)
+			return
+	def post(self):
+		comment_id = self.request.get('comment')
+		key = db.Key.from_path('Comment', int(comment_id))
+		comment = db.get(key)
+		if self.user.name == comment.creator:
+			content = self.request.get('content')
+			creator = self.request.get('creator')
+		if content:
+			comment.content = content
+			comment.put()
+			self.redirect('/')
+		else:
+			error = "Please fill in a comment"
+			self.render('editcomment.html', content = content, error = error)
 
 class Like(Handler):
 	def get(self, post_id):
@@ -404,8 +430,8 @@ app = webapp2.WSGIApplication([
     ('/login', Login),
     ('/logout', Logout),
 		('/newcomment', NewComment),
-		#("/([0-9]+)/editcomment", EditComment),
-		#("/([0-9]+)/deletecomment/([0-9]+)", DeleteComment),
+		('/editcomment', EditComment),
+		('/deletecomment', DeleteComment),
   	('/([0-9]+)/like', Like),
 		],
 		debug=True)

@@ -32,11 +32,11 @@
 
     <!--allows the comment's creator to edit or delete their comments-->
       {% if c.creator == user.name %}
-        <h4><a href="/{{post.key().id()}}/editcomment/{{c.key().id()}}">Edit</a> | <a href="/{{post.key().id()}}/deletecomment/{{c.key().id()}}"> Delete</a></h4>
+        <h4><a href="/editcomment?comment={{c.key().id()}}">Edit</a> | <a href="/deletecomment?comment={{c.key().id()}}"> Delete</a></h4>
       {% endif %}
     </div>
     <br>
-  	<div class="comment-body">{{c.comment}}</div>
+  	<div class="comment-body">{{c.content}}</div>
     <br><br>
   </div>
   {% endfor %}
