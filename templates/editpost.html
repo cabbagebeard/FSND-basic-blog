@@ -1,9 +1,8 @@
-<head>
-	<title>Edit Post</title>
-</head>
-
 {% extends "base.html" %}
 
+{% block title %}
+  Edit Post
+{% endblock %}
 {% block content %}
 
 <h1>Editing post</h1>
@@ -28,7 +27,7 @@
       <br>
 
       <input type="submit">
-    </form>
+      <h3 class="cancel"><a href="/">CANCEL</a></h3>
   </div>
 	
 {% endblock %}

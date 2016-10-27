@@ -1,7 +1,8 @@
-<head>
-	<title>Blog</title>
-</head>
-{% extends "base.html" %}	
+
+{% extends "base.html" %}
+{% block title %}
+Blog
+{% endblock %}	
 	<br><br>
 	{% block content %}
 
@@ -9,7 +10,6 @@
 		<h1>Welcome to the blog.</h1>
 		<h3 style="text-align:center"><a href="/login">You are not signed in.</a></h3>
 	{% endif %}
-
 	{% if user %}<h1>Welcome, {{ user.name }}.</h1>{% endif %}
 	<br><br>
 

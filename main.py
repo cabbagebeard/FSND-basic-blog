@@ -59,6 +59,9 @@ class Handler(webapp2.RequestHandler):
 		uid = self.read_secure_cookie('user_id')
 		self.user = uid and User.by_id(int(uid))
 
+def blog_key(name = 'default'):
+	return db.Key.from_path('blogs', name)
+
 ## user registration
 def make_salt(length = 5):
 		return ''.join(random.choice(letters) for x in xrange(length))
@@ -105,9 +108,6 @@ class User(db.Model):
 			return user
 
 
-def blog_key(name = 'default'):
-	return db.Key.from_path('blogs', name)
-
 class Post(db.Model):
 	subject = db.StringProperty(required = True)
 	content = db.TextProperty(required = True)
@@ -147,7 +147,8 @@ class PostPage(Handler):
 		post = db.get(key)
 
 		if not post:
-			self.error(404)
+			error = "It looks as if that post does not exist."
+			self.render('error.html', error=error)
 			return
 
 		self.render("permalink.html", post = post)
@@ -157,11 +158,13 @@ class NewPost(Handler):
 		if self.user:
 			self.render("newpost.html")
 		else:
-			self.redirect('/login')
+			error = "You must be logged in to make a new post. Please login or sign up."
+			self.render("error.html", error=error)
 
 	def post(self):
 		if not self.user:
-			self.redirect('/login')
+			error = "You must be logged in to make a new post. Please login or sign up."
+			self.render("error.html", error=error)
 		subject = self.request.get('subject')
 		content = self.request.get('content')
 		creator = self.request.get('creator')
@@ -181,23 +184,28 @@ class DeletePost(Handler):
 			key = db.Key.from_path("Post", int(post_id), parent=blog_key())
 			post = db.get(key)
 		if not post:
-			self.error(405)
-			return
+			error = "It looks as if that post does not exist."
+			self.render('error.html', error=error)
 		if self.user.name == post.creator:
 			self.render("delete.html", post=post_id)
 		else:
-			self.redirect('/')
+			error = "You must be the author of a post to delete it."
+			self.render('error.html', error=error)
 
 	def post(self):
 		if self.user:
 			post_id = self.request.get("post")
 			key = db.Key.from_path('Post', int(post_id), parent=blog_key())
 			post = db.get(key)
+			if not post:
+				error = "It looks as if that post does not exist."
+				self.render('error.html', error=error)
 			if post.creator == self.user.name:
 				post.delete()
 				self.redirect('/deletion')
 			else:
-				self.redirect('/')
+				error = "You must be the post's author to delete it."
+				self.render('error.html', error=error)
 
 class DeleteSuccess(Handler):
 	def get(self):
@@ -210,12 +218,13 @@ class EditPost(Handler):
 			key = db.Key.from_path("Post", int(post_id), parent=blog_key())
 			post = db.get(key)
 		if not post:
-			self.error(404)
-			return
+			error = "It looks as if that post does not exist."
+			self.render('error.html', error=error)
 		if self.user.name == post.creator:
 			self.render('editpost.html', subject = post.subject, content = post.content)
 		else:
-			self.redirect('/')
+			error = "You must be the post's author to edit it."
+			self.render("error.html", error=error)
 
 	def post(self):
 		if self.user:
@@ -225,10 +234,14 @@ class EditPost(Handler):
 			subject = self.request.get("subject")
 			content = self.request.get("content")
 			creator = self.request.get('creator')
+		if not post:
+			error = "It looks as if that post does not exist."
+			self.render('error.html', error=error)
 		if subject and content:
 			post.subject = subject
 			post.content = content
 			post.edited = True
+		if self.user.name == post.creator:
 			post.put()
 			self.redirect("/%s" % str(post.key().id()))
 		else:
@@ -243,15 +256,19 @@ class NewComment(Handler):
 		if self.user:
 			self.render('newcomment.html', post=post_id)
 		if not post:
-			self.error(405)
-			return
+			error = "It looks as if that post does not exist."
+			self.render('error.html', error=error)
 		if not self.user:
-			self.redirect('/login')
+			error = "You must be logged in to post a comment. Please login or sign up."
+			self.render("error.html", error=error)
 
 	def post(self):
 		post_id = self.request.get("post")
 		key = db.Key.from_path("Post", int(post_id), parent=blog_key())
 		post = db.get(key)
+		if not post:
+			error = "It looks as if that post does not exist."
+			self.render('error.html', error=error)
 		if self.user:
 			content = self.request.get('content')
 			creator = self.request.get('creator')
@@ -268,36 +285,48 @@ class DeleteComment(Handler):
 		comment_id = self.request.get('comment')
 		key = db.Key.from_path('Comment', int(comment_id))
 		comment = db.get(key)
+		if not comment:
+			error = "It looks as if that comment does not exist."
+			self.render("error.html", error=error)
 		if self.user.name == comment.creator:
 			self.render("deletecomment.html", comment=comment)
 		else:
-			self.error(405)
-			return
+			error = "You must be the comment's author to delete it."
+			self.render("error.html", error=error)
 	def post(self):
 		comment_id = self.request.get('comment')
 		key = db.Key.from_path('Comment', int(comment_id))
 		comment = db.get(key)
+		if not comment:
+			error = "It looks as if that comment does not exist."
+			self.render("error.html", error=error)
 		if self.user.name == comment.creator:
 			comment.delete()
 			self.redirect('/deletion')
 		else:
-			self.error(405)
-			return
+			error = "You must be the comment's author to delete it."
+			self.render("error.html", error=error)
 
 class EditComment(Handler):
 	def get(self):
 		comment_id = self.request.get('comment')
 		key = db.Key.from_path('Comment', int(comment_id))
 		comment = db.get(key)
+		if not comment:
+			error = "It looks as if that comment does not exist."
+			self.render("error.html", error=error)
 		if self.user.name == comment.creator:
 			self.render('editcomment.html', comment=comment, content=comment.content)
 		else:
-			self.error(405)
-			return
+			error = "You must be the comment's author to edit it."
+			sself.render("error.html", error=error)
 	def post(self):
 		comment_id = self.request.get('comment')
 		key = db.Key.from_path('Comment', int(comment_id))
 		comment = db.get(key)
+		if not comment:
+			error = "It looks as if that comment does not exist."
+			self.render("error.html", error=error)
 		if self.user.name == comment.creator:
 			content = self.request.get('content')
 			creator = self.request.get('creator')
@@ -313,12 +342,15 @@ class Like(Handler):
 	def get(self, post_id):
 		key = db.Key.from_path("Post", int(post_id), parent=blog_key())
 		post = db.get(key)
+		if not post:
+			error = "It looks as if that post does not exist."
+			self.render('error.html', error=error)
 		if not self.user:
-			self.redirect('/login')
+			error = "You must be logged in to like a post. Please login or sign up."
+			self.render("error.html", error=error)
 		else:
 			creator = post.creator
 			current_user = self.user.name
-
 		if creator ==  current_user or current_user in post.liked_by:
 			self.redirect("/%s" % str(post.key().id()))
 		else:

@@ -1,8 +1,11 @@
-<head>
-	<title>{{post.subject}}</title>
-</head>
-<br> <br>
 {% extends "base.html" %}
+
+{% block title %}
+  {{post.subject}}
+{% endblock %}
+
+<br> <br>
+
 {% block content %}
 	{% if user.name == post.creator %} 
 		<h3><a href="/editpost?post={{post.key().id()}}">Edit</a> | <a href="/delete?post={{post.key().id()}}"> Delete</a></h3>
