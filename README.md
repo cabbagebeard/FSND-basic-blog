@@ -4,6 +4,6 @@
 
 ###If you wish to run your own: 
 
-- git clone https://github.com/cabbagebeard/FSND-basic-blog.git
-- cd FSND-basic-blog
+- git clone https://github.com/cabbagebeard/basic-blog.git
+- cd basic-blog
 - gcloud app deploy app.yaml
